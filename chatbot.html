@@ -1,0 +1,272 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Chatbot — LLM Playground</title>
+    <style type="text/tailwindcss">
+      @variant dark (&:where(.dark, .dark *));
+
+      .param-label {
+        @apply text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider;
+      }
+      .param-value {
+        @apply text-xs font-mono font-bold text-neutral-700 dark:text-neutral-300;
+      }
+      input[type="range"] {
+        @apply w-full accent-neutral-900 dark:accent-white;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-neutral-50 dark:bg-neutral-950 transition-colors h-screen flex flex-col overflow-hidden"
+  >
+    <div id="navbar"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+      <!-- LEFT PANEL — Parameters -->
+      <div
+        id="left-panel"
+        class="shrink-0 w-70 border-r transition-all duration-100 ease-in-out border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col overflow-y-auto"
+      >
+        <div class="p-4 border-b border-neutral-200 dark:border-neutral-800">
+          <h2
+            class="text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+          >
+            Parameters
+          </h2>
+          <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
+            Tune how the model responds
+          </p>
+        </div>
+
+        <div class="p-4 space-y-6 flex-1">
+          <!-- System Prompt -->
+          <div>
+            <label class="param-label block mb-1.5">System Prompt</label>
+            <textarea
+              id="system-prompt"
+              rows="5"
+              placeholder="You are a helpful assistant..."
+              class="w-full text-xs border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-300 dark:placeholder:text-neutral-600 resize-none focus:outline-none focus:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 transition"
+            ></textarea>
+          </div>
+
+          <!-- Temperature -->
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <label class="param-label">Temperature</label>
+              <span class="param-value" id="temperature-val">0.7</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="2"
+              step="0.01"
+              value="0.7"
+              id="temperature"
+              oninput="
+                document.getElementById('temperature-val').textContent =
+                  parseFloat(this.value).toFixed(2)
+              "
+            />
+            <div class="flex justify-between mt-1">
+              <span class="text-xs text-neutral-300 dark:text-neutral-600"
+                >Precise</span
+              >
+              <span class="text-xs text-neutral-300 dark:text-neutral-600"
+                >Creative</span
+              >
+            </div>
+          </div>
+
+          <!-- Top P -->
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <label class="param-label">Top P</label>
+              <span class="param-value" id="topp-val">0.90</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="0.9"
+              id="top-p"
+              oninput="
+                document.getElementById('topp-val').textContent = parseFloat(
+                  this.value,
+                ).toFixed(2)
+              "
+            />
+          </div>
+
+          <!-- Top K -->
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <label class="param-label">Top K</label>
+              <span class="param-value" id="topk-val">50</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="100"
+              step="1"
+              value="50"
+              id="top-k"
+              oninput="
+                document.getElementById('topk-val').textContent = this.value
+              "
+            />
+          </div>
+
+          <!-- Frequency Penalty -->
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <label class="param-label">Frequency Penalty</label>
+              <span class="param-value" id="freqpenalty-val">0.00</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="2"
+              step="0.01"
+              value="0"
+              id="freq-penalty"
+              oninput="
+                document.getElementById('freqpenalty-val').textContent =
+                  parseFloat(this.value).toFixed(2)
+              "
+            />
+          </div>
+
+          <!-- Presence Penalty -->
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <label class="param-label">Presence Penalty</label>
+              <span class="param-value" id="prespenalty-val">0.00</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="2"
+              step="0.01"
+              value="0"
+              id="pres-penalty"
+              oninput="
+                document.getElementById('prespenalty-val').textContent =
+                  parseFloat(this.value).toFixed(2)
+              "
+            />
+          </div>
+
+          <!-- Max Tokens -->
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <label class="param-label">Max Tokens</label>
+              <span class="param-value" id="maxtokens-val">1024</span>
+            </div>
+            <input
+              type="range"
+              min="64"
+              max="4096"
+              step="64"
+              value="1024"
+              id="max-tokens"
+              oninput="
+                document.getElementById('maxtokens-val').textContent =
+                  this.value
+              "
+            />
+          </div>
+
+          <!-- Reset Button -->
+          <button
+            onclick="resetParams()"
+            class="w-full text-xs py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+          >
+            Reset to defaults
+          </button>
+        </div>
+
+        <!-- Dark mode toggle footer in left panel -->
+        <div id="footer"></div>
+      </div>
+
+      <!-- RESIZER -->
+      <div
+        id="resizer"
+        class="w-1 hover:bg-blue-500 transition cursor-col-resize"
+      ></div>
+
+      <!-- RIGHT PANEL — Chat -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Chat Messages -->
+        <div
+          id="chat-messages"
+          class="flex-1 overflow-y-auto px-6 py-6 space-y-4"
+        >
+          <div
+            id="empty-state"
+            class="h-full flex flex-col items-center justify-center text-center"
+          >
+            <div class="text-4xl mb-3">🤖</div>
+            <p
+              class="text-sm font-semibold text-neutral-700 dark:text-neutral-300"
+            >
+              Start a conversation
+            </p>
+            <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+              Tune the parameters on the left, then send a message
+            </p>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div
+          class="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 py-3"
+        >
+          <div class="flex gap-2 items-end">
+            <textarea
+              id="user-input"
+              rows="1"
+              placeholder="Send a message..."
+              class="flex-1 border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-neutral-800 dark:text-neutral-200 bg-white dark:bg-neutral-800 resize-none focus:outline-none focus:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 transition placeholder:text-neutral-300 dark:placeholder:text-neutral-600"
+              onkeydown="
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  sendMessage();
+                }
+              "
+              oninput="
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+              "
+            ></textarea>
+            <button
+              onclick="sendMessage()"
+              class="shrink-0 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-neutral-700 dark:hover:bg-neutral-200 transition-colors"
+            >
+              Send
+            </button>
+            <button
+              onclick="clearChat()"
+              class="shrink-0 border border-neutral-200 dark:border-neutral-700 text-neutral-400 dark:text-neutral-500 px-3 py-2.5 rounded-xl text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+              title="Clear chat"
+            >
+              🗑️
+            </button>
+          </div>
+          <p class="text-xs text-neutral-300 dark:text-neutral-600 mt-2 ml-1">
+            Shift + Enter for new line
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="components/footer.js"></script>
+    <script src="components/navbar.js"></script>
+    <script type="module" src="js/chatbot.js"></script>
+  </body>
+</html>

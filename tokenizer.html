@@ -1,0 +1,354 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Tokenizer — LLM Playground</title>
+    <style type="text/tailwindcss">
+      @variant dark (&:where(.dark, .dark *));
+      .model-btn {
+        @apply px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors cursor-pointer;
+        @apply bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700;
+      }
+      .model-btn:hover {
+        @apply bg-neutral-100 dark:bg-neutral-800;
+      }
+      .model-btn.active-model {
+        @apply bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border-neutral-300 dark:border-neutral-600;
+      }
+      .token-0 {
+        @apply bg-violet-100 dark:bg-violet-900 text-violet-800 dark:text-violet-200 border-violet-200 dark:border-violet-700;
+      }
+      .token-1 {
+        @apply bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700;
+      }
+      .token-2 {
+        @apply bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700;
+      }
+      .token-3 {
+        @apply bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-700;
+      }
+      .token-4 {
+        @apply bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-700;
+      }
+      .token-5 {
+        @apply bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 border-cyan-200 dark:border-cyan-700;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-neutral-50 dark:bg-neutral-950 min-h-screen transition-colors"
+  >
+    <div id="navbar"></div>
+
+    <div class="max-w-3xl mx-auto px-6 py-10">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1
+          class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-1"
+        >
+          🔤 Tokenizer
+        </h1>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+          Uses the real
+          <code
+            class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-700 dark:text-neutral-300 text-xs"
+            >tiktoken</code
+          >
+          library — exactly what GPT models use under the hood.
+        </p>
+      </div>
+
+      <!-- Concept Banner -->
+      <div
+        class="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl px-5 py-4 mb-8 flex gap-3"
+      >
+        <span class="text-lg">💡</span>
+        <div>
+          <p
+            class="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-0.5"
+          >
+            How this works
+          </p>
+          <p class="text-sm text-amber-700 dark:text-amber-300">
+            This page uses the actual <strong>tiktoken</strong> library — the
+            same one OpenAI's models use. Each colored block is a real token,
+            and below it is the actual token ID.
+          </p>
+        </div>
+      </div>
+
+      <!-- Model Selector -->
+      <div class="mb-6">
+        <p
+          class="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-2"
+        >
+          Model
+        </p>
+        <div id="model-selector"></div>
+      </div>
+
+      <!-- Input -->
+      <div class="mb-6">
+        <p
+          class="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-2"
+        >
+          Your Text
+        </p>
+        <textarea
+          id="input-text"
+          class="w-full border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 bg-white dark:bg-neutral-900 resize-none focus:outline-none focus:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 transition"
+          rows="4"
+          placeholder="Type or paste any text here..."
+        >
+Hello, how are you?</textarea
+        >
+
+        <!-- Examples -->
+        <div class="flex gap-2 flex-wrap mt-2">
+          <span
+            class="text-xs text-neutral-400 dark:text-neutral-500 self-center"
+            >Try:</span
+          >
+          <button
+            onclick="setExample('Hello, how are you?')"
+            class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          >
+            Hello, how are you?
+          </button>
+          <button
+            onclick="setExample('unhappiness')"
+            class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          >
+            unhappiness
+          </button>
+          <button
+            onclick="setExample('I love eating pizza 🍕')"
+            class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          >
+            I love eating pizza 🍕
+          </button>
+          <button
+            onclick="setExample('def fibonacci(n):')"
+            class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          >
+            def fibonacci(n):
+          </button>
+          <button
+            onclick="setExample('मुझे खाना बहुत पसंद है')"
+            class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          >
+            Hindi text
+          </button>
+        </div>
+      </div>
+
+      <!-- Token Visualizer -->
+      <div
+        class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 mb-6"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <p
+            class="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider"
+          >
+            Tokens
+          </p>
+          <span
+            id="token-count-badge"
+            class="text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-2.5 py-1 rounded-full"
+            >0 tokens</span
+          >
+        </div>
+        <div
+          id="token-display"
+          class="flex flex-wrap gap-1.5 mb-4 min-h-10"
+        ></div>
+        <div class="border-t border-neutral-100 dark:border-neutral-800 pt-3">
+          <p
+            class="text-xs text-neutral-400 dark:text-neutral-500 mb-1.5 font-medium"
+          >
+            Token IDs
+          </p>
+          <div
+            id="token-ids"
+            class="text-xs font-mono text-neutral-500 dark:text-neutral-400 flex flex-wrap gap-1.5"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-3 gap-4 mb-10">
+        <div
+          class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 text-center"
+        >
+          <p
+            class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
+            id="stat-tokens"
+          >
+            0
+          </p>
+          <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+            Total Tokens
+          </p>
+        </div>
+        <div
+          class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 text-center"
+        >
+          <p
+            class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
+            id="stat-chars"
+          >
+            0
+          </p>
+          <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+            Characters
+          </p>
+        </div>
+        <div
+          class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 text-center"
+        >
+          <p
+            class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
+            id="stat-ratio"
+          >
+            0
+          </p>
+          <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+            Chars per Token
+          </p>
+        </div>
+      </div>
+
+      <!-- Try This -->
+      <div
+        class="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 mb-8"
+      >
+        <p
+          class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3"
+        >
+          🔍 Things to explore
+        </p>
+        <ul class="space-y-2">
+          <li class="text-sm text-neutral-500 dark:text-neutral-400">
+            →
+            <button
+              onclick="setExample('unhappiness')"
+              class="text-neutral-700 dark:text-neutral-300 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-neutral-100"
+            >
+              "unhappiness"
+            </button>
+            — how many tokens does it split into?
+          </li>
+          <li class="text-sm text-neutral-500 dark:text-neutral-400">
+            →
+            <button
+              onclick="setExample('I love eating pizza 🍕')"
+              class="text-neutral-700 dark:text-neutral-300 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-neutral-100"
+            >
+              Emoji 🍕
+            </button>
+            — how many tokens does it take?
+          </li>
+          <li class="text-sm text-neutral-500 dark:text-neutral-400">
+            →
+            <button
+              onclick="setExample('मुझे खाना बहुत पसंद है')"
+              class="text-neutral-700 dark:text-neutral-300 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-neutral-100"
+            >
+              Hindi text
+            </button>
+            — why does it use more tokens than English?
+          </li>
+          <li class="text-sm text-neutral-500 dark:text-neutral-400">
+            →
+            <button
+              onclick="
+                setExample(
+                  'def fibonacci(n):\n    if n <= 1:\n        return n',
+                )
+              "
+              class="text-neutral-700 dark:text-neutral-300 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-neutral-100"
+            >
+              Code
+            </button>
+            — are spaces and indentation separate tokens?
+          </li>
+        </ul>
+      </div>
+
+      <!-- BPE Explainer -->
+      <div
+        class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5"
+      >
+        <p
+          class="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-4"
+        >
+          🔍 How BPE (Byte Pair Encoding) Works
+        </p>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div
+            class="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3"
+          >
+            <p
+              class="text-xs font-bold text-neutral-400 dark:text-neutral-500 mb-1"
+            >
+              Step 1
+            </p>
+            <p class="text-xs text-neutral-700 dark:text-neutral-300">
+              Start with individual characters —
+              <code class="bg-neutral-100 dark:bg-neutral-700 px-1 rounded"
+                >l, o, w, e, r</code
+              >
+            </p>
+          </div>
+          <div
+            class="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3"
+          >
+            <p
+              class="text-xs font-bold text-neutral-400 dark:text-neutral-500 mb-1"
+            >
+              Step 2
+            </p>
+            <p class="text-xs text-neutral-700 dark:text-neutral-300">
+              Find the most frequent pair and merge —
+              <code class="bg-neutral-100 dark:bg-neutral-700 px-1 rounded"
+                >"l"+"o" = "lo"</code
+              >
+            </p>
+          </div>
+          <div
+            class="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3"
+          >
+            <p
+              class="text-xs font-bold text-neutral-400 dark:text-neutral-500 mb-1"
+            >
+              Step 3
+            </p>
+            <p class="text-xs text-neutral-700 dark:text-neutral-300">
+              Repeat until the target vocabulary size is reached
+            </p>
+          </div>
+          <div
+            class="bg-violet-50 dark:bg-violet-950 border border-violet-200 dark:border-violet-800 rounded-lg p-3"
+          >
+            <p
+              class="text-xs font-bold text-violet-400 dark:text-violet-500 mb-1"
+            >
+              Result
+            </p>
+            <p class="text-xs text-violet-700 dark:text-violet-300">
+              Common words = 1 token. Rare words = multiple tokens.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer"></div>
+    <script src="components/footer.js"></script>
+    <script src="components/navbar.js"></script>
+    <script src="components/tokenizer/modelSelector.js"></script>
+    <script type="module" src="js/tokenizer.js"></script>
+  </body>
+</html>

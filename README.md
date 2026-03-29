@@ -8,6 +8,12 @@ An interactive playground to learn how LLMs work — built with vanilla JS + Nod
 - **Tokenizer** — Visualize how text is broken into tokens (uses real tiktoken)
 - **Chatbot** — Chat with Gemini with tunable parameters
 
+## 🎬 Demo
+
+> Quick walkthrough of the LLM Playground 👇
+https://github.com/user-attachments/assets/71fffe83-f92e-4734-8ea8-6c2810a59a43
+
+
 ## Setup
 
 1. Clone the repo

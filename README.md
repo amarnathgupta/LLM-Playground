@@ -27,7 +27,7 @@ https://github.com/user-attachments/assets/71fffe83-f92e-4734-8ea8-6c2810a59a43
 3. Add your Gemini API key
    cp .env.example .env
 
-   # .env file mein apni key daalo
+   # put your gemini_api_key in .env
 
 4. Run
    npm start

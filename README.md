@@ -18,7 +18,7 @@ https://github.com/user-attachments/assets/71fffe83-f92e-4734-8ea8-6c2810a59a43
 ## Setup
 
 1. Clone the repo
-   git clone https://github.com/yourusername/llm-playground.git
+   git clone https://github.com/amarnathgupta/llm-playground.git
    cd llm-playground
 
 2. Install dependencies

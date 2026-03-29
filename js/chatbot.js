@@ -47,7 +47,7 @@ function getParams() {
   };
 }
 
-function resetParams() {
+window.resetParams = function () {
   document.getElementById("temperature").value = 0.7;
   document.getElementById("temperature-val").textContent = "0.70";
   document.getElementById("top-p").value = 0.9;
@@ -60,7 +60,7 @@ function resetParams() {
   document.getElementById("prespenalty-val").textContent = "0.00";
   document.getElementById("max-tokens").value = 1024;
   document.getElementById("maxtokens-val").textContent = "1024";
-}
+};
 
 function renderMessages() {
   const container = document.getElementById("chat-messages");

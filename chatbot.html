@@ -28,7 +28,7 @@
       <!-- LEFT PANEL — Parameters -->
       <div
         id="left-panel"
-        class="shrink-0 w-70 border-r transition-all duration-100 ease-in-out border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col overflow-y-auto"
+        class="shrink-0 w-70 border-r transition-all duration-100 ease-in-out border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] overflow-y-auto"
       >
         <div class="p-4 border-b border-neutral-200 dark:border-neutral-800">
           <h2
@@ -207,7 +207,7 @@
           id="chat-messages"
           class="flex-1 overflow-y-auto px-6 py-6 space-y-4"
         >
-          <div
+          <!-- <div
             id="empty-state"
             class="h-full flex flex-col items-center justify-center text-center"
           >
@@ -219,6 +219,34 @@
             </p>
             <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
               Tune the parameters on the left, then send a message
+            </p>
+          </div> -->
+
+          <div
+            id="empty-state"
+            class="h-full flex flex-col items-center justify-center gap-3 text-center"
+          >
+            <div
+              class="flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-200 dark:border-neutral-700"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"
+              ></span>
+              <span
+                class="text-[11px] font-medium uppercase tracking-widest text-neutral-400 dark:text-neutral-500"
+                >Ready</span
+              >
+            </div>
+            <p
+              class="text-xl font-medium tracking-tight text-neutral-800 dark:text-neutral-100"
+            >
+              LLM Playground
+            </p>
+            <p
+              class="text-[13px] text-neutral-400 dark:text-neutral-500 leading-relaxed max-w-xs"
+            >
+              Configure the model parameters on the left, then send a message to
+              start testing.
             </p>
           </div>
         </div>
